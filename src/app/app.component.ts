@@ -1,4 +1,3 @@
-import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { themeChange } from 'theme-change';
 import { HeaderComponent } from './components/header/header.component';
