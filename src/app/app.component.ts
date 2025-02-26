@@ -1,9 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { themeChange } from 'theme-change';
-import { DropdownThemesComponent } from './components/dropdown-themes/dropdown-themes.component';
-import { NavBarComponent } from './components/nav-bar/nav-bar.component';
-import { SearchFieldComponent } from './components/search-field/search-field.component';
+import { NavBarComponent } from './components/navBar/nav-bar.component';
 
 @Component({
   selector: 'app-root',
