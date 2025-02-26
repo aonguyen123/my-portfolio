@@ -1,13 +1,13 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { themeChange } from 'theme-change';
-import { NavBarComponent } from './components/navbar/nav-bar.component';
+import { HeaderComponent } from './components/header/header.component';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  imports: [CommonModule, NavBarComponent],
+  imports: [CommonModule, HeaderComponent],
 })
 export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
