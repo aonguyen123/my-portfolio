@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component } from '@angular/core';
 import { themeChange } from 'theme-change';
-import { NavBarComponent } from './components/navBar/nav-bar.component';
+import { NavBarComponent } from './components/navbar/nav-bar.component';
 
 @Component({
   selector: 'app-root',
