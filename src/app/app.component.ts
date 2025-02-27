@@ -1,4 +1,5 @@
 import { AfterViewInit, Component } from '@angular/core';
+import { RouterModule } from '@angular/router';
 import { themeChange } from 'theme-change';
 import { HeaderComponent } from './components/header/header.component';
 
@@ -6,7 +7,7 @@ import { HeaderComponent } from './components/header/header.component';
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrl: './app.component.css',
-  imports: [HeaderComponent],
+  imports: [HeaderComponent, RouterModule],
 })
 export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
