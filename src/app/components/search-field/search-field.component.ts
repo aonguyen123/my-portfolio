@@ -1,4 +1,11 @@
-import { Component, input, output, Output, signal } from '@angular/core';
+import {
+  Component,
+  input,
+  OnDestroy,
+  output,
+  Output,
+  signal,
+} from '@angular/core';
 
 @Component({
   selector: 'app-search-field',
