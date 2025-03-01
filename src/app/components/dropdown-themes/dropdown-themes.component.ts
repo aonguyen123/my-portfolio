@@ -1,27 +1,6 @@
 import { CommonModule } from '@angular/common';
-import {
-  AfterViewChecked,
-  AfterViewInit,
-  Component,
-  effect,
-  ElementRef,
-  OnInit,
-  QueryList,
-  ViewChildren,
-} from '@angular/core';
-import {
-  combineLatest,
-  distinctUntilChanged,
-  fromEvent,
-  map,
-  merge,
-  Observable,
-  of,
-  startWith,
-  Subject,
-  tap,
-} from 'rxjs';
-import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Component } from '@angular/core';
+import { distinctUntilChanged, map, startWith, Subject, tap } from 'rxjs';
 import { SearchFieldComponent } from '../search-field/search-field.component';
 
 @Component({
