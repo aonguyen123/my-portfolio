@@ -11,6 +11,6 @@ import { HeaderComponent } from './components/header/header.component';
 })
 export class AppComponent implements AfterViewInit {
   ngAfterViewInit(): void {
-    themeChange(false);
+    // themeChange(false);
   }
 }

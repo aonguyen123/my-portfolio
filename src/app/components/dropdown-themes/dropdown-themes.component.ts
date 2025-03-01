@@ -1,23 +1,36 @@
+import { CommonModule } from '@angular/common';
 import {
+  AfterViewChecked,
   AfterViewInit,
   Component,
+  effect,
   ElementRef,
+  OnInit,
   QueryList,
   ViewChildren,
 } from '@angular/core';
+import {
+  combineLatest,
+  distinctUntilChanged,
+  fromEvent,
+  map,
+  merge,
+  Observable,
+  of,
+  startWith,
+  Subject,
+  tap,
+} from 'rxjs';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { SearchFieldComponent } from '../search-field/search-field.component';
 
 @Component({
   selector: 'app-dropdown-themes',
-  imports: [SearchFieldComponent],
+  imports: [SearchFieldComponent, CommonModule],
   templateUrl: './dropdown-themes.component.html',
   styleUrl: './dropdown-themes.component.css',
 })
-export class DropdownThemesComponent implements AfterViewInit {
-  @ViewChildren('themeBtn') themesElement!: QueryList<
-    ElementRef<HTMLButtonElement>
-  >;
-
+export class DropdownThemesComponent {
   themes: Array<string> = [
     'light',
     'dark',
@@ -56,12 +69,33 @@ export class DropdownThemesComponent implements AfterViewInit {
     'silk',
   ];
 
-  ngAfterViewInit(): void {
-    this.themes.forEach((item, idx) => {
-      const themeItem = this.themesElement.find(
-        (element, index) => index === idx
+  inputSearchTheme$ = new Subject<string>();
+
+  themeSelected$ = new Subject<string>();
+
+  currentTheme$ = this.themeSelected$.pipe(
+    startWith(localStorage.getItem('theme') || 'light'),
+    tap((theme) => {
+      localStorage.setItem('theme', theme);
+
+      document
+        .getElementsByTagName('html')[0]
+        .setAttribute('data-theme', theme);
+    })
+  );
+
+  dataSearchTheme$ = this.inputSearchTheme$.pipe(
+    startWith(''),
+    distinctUntilChanged(),
+    map((searching) => {
+      if (!searching) return this.themes;
+      return this.themes.filter((theme) =>
+        theme.toLowerCase().startsWith(searching.toLowerCase())
       );
-      themeItem?.nativeElement.setAttribute('data-set-theme', item);
-    });
+    })
+  );
+
+  onChangeTheme(theme: string) {
+    this.themeSelected$.next(theme);
   }
 }
