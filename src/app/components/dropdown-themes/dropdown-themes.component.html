@@ -4,16 +4,21 @@
   <app-search-field (inputValue)="inputSearchTheme$.next($event)" />
   <div class="max-h-[calc(100vh-30rem)] overflow-y-auto mt-2">
     <ul class="menu w-full">
-      <ng-container *ngIf="currentTheme$ | async as currentTheme">
-        @if (!(dataSearchTheme$ | async)?.length) {
-        <span class="text-xs text-center">Not found</span>
-        } @else { @for (theme of dataSearchTheme$ | async; track theme; ) {
+      <ng-container
+        *ngIf="{
+          currentTheme: currentTheme$ | async,
+          dataTheme: dataSearchTheme$ | async
+        } as vm"
+      >
+        @if (!vm.dataTheme?.length) {
+        <span class="text-xs">Not found</span>
+        } @else { @for (theme of vm.dataTheme; track theme; ) {
         <li>
           <button
             class="flex justify-between"
             (click)="onChangeTheme(theme)"
             [ngClass]="{
-              '[&_svg]:visible': currentTheme === theme
+              '[&_svg]:visible': vm.currentTheme === theme
             }"
           >
             <div class="truncate">{{ theme }}</div>
