@@ -1,0 +1,50 @@
+<div class="hero bg-base-200 min-h-screen rounded-3xl max-w-5xl m-auto">
+  <div class="hero-content text-center">
+    <div class="max-w-4xl">
+      <h1 class="text-5xl font-bold">Skills</h1>
+      <div class="flex flex-col gap-2 p-6">
+        <div class="text-xs uppercase font-semibold opacity-60 text-left">
+          {{ skills.development.label }}
+        </div>
+        <div class="flex items-center flex-wrap gap-2">
+          @for (item of skills.development.skills; track $index) {
+          <app-skill-item [skill]="item" />
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 p-6">
+        <div class="text-xs uppercase font-semibold opacity-60 text-left">
+          {{ skills.layouts.label }}
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (item of skills.layouts.skills; track $index) {
+          <app-skill-item [skill]="item" />
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 p-6">
+        <div class="text-xs uppercase font-semibold opacity-60 text-left">
+          {{ skills.apiLibraries.label }}
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (item of skills.apiLibraries.skills; track $index) {
+          <app-skill-item [skill]="item" />
+          }
+        </div>
+      </div>
+
+      <div class="flex flex-col gap-2 p-6">
+        <div class="text-xs uppercase font-semibold opacity-60 text-left">
+          {{ skills.tools.label }}
+        </div>
+        <div class="flex flex-wrap gap-2">
+          @for (item of skills.tools.skills; track $index) {
+          <app-skill-item [skill]="item" />
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
