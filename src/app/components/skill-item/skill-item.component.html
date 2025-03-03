@@ -1,3 +1,13 @@
-<div [ngClass]="className">
+<div
+  class="badge badge-dash"
+  [ngClass]="{
+              'badge-primary': className === 'primary',
+              'badge-secondary': className === 'secondary',
+              'badge-accent': className === 'accent',
+              'badge-error': className === 'error',
+              'badge-info': className === 'info',
+              'badge-success': className === 'success',
+            }"
+>
   {{ skill().name }}
 </div>

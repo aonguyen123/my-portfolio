@@ -16,6 +16,6 @@ export class SkillItemComponent {
   skill = input.required<Skill>();
 
   get className() {
-    return `badge badge-dash badge-${this.skill().color}`;
+    return this.skill().color;
   }
 }
