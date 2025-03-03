@@ -1,4 +1,5 @@
 import { Component, input, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 
 export interface Skill {
   name: string;
@@ -7,10 +8,14 @@ export interface Skill {
 
 @Component({
   selector: 'app-skill-item',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './skill-item.component.html',
   styleUrl: './skill-item.component.css',
 })
 export class SkillItemComponent {
   skill = input.required<Skill>();
+
+  get className() {
+    return `badge badge-dash badge-${this.skill().color}`;
+  }
 }
