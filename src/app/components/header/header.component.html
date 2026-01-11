@@ -5,32 +5,58 @@
     target="_blank"
   >
     <svg
-      viewBox="0 0 24 24"
+      viewBox="0 0 48 48"
+      id="b"
+      xmlns="http://www.w3.org/2000/svg"
       class="size-6 stroke-primary stroke-2 fill-primary"
     >
-      <path
+      <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+      <g
+        id="SVGRepo_tracerCarrier"
         stroke-linecap="round"
         stroke-linejoin="round"
-        d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12Z"
-      />
+      ></g>
+      <g id="SVGRepo_iconCarrier">
+        <defs>
+          <style></style>
+        </defs>
+        <path
+          class="stroke-secondary"
+          d="m27.1631,26.9476c1.7358,1.5947,4.044,2.5764,6.5869,2.5764,5.3848,0,9.75-4.3652,9.75-9.75,0-5.3848-4.3652-9.75-9.75-9.75-2.293,0-4.397.7969-6.0619,2.1218h-7.3762c-1.6649-1.3248-3.7689-2.1218-6.0619-2.1218-5.3848,0-9.75,4.3652-9.75,9.75s4.3652,9.75,9.75,9.75c2.543,0,4.8511-.9817,6.5869-2.5764h6.3261Z"
+        ></path>
+        <path
+          class="stroke-secondary"
+          d="m43.5,19.774v12.645c0,3.069-2.4879,5.557-5.557,5.557-1.2609,0-2.4958-.3357-3.3428-1.1437-1.5448-1.4734-4.6254-4.4744-6.1624-5.9709-.4484-.4365-1.0497-.6807-1.6755-.6807h-5.5247c-.6258,0-1.2271.2441-1.6755.6807-1.537,1.4964-4.6176,4.4974-6.1624,5.9709-.8471.808-2.082,1.1437-3.3428,1.1437-3.0691,0-5.557-2.488-5.557-5.557v-12.645"
+        ></path>
+        <circle
+          class="stroke-secondary"
+          cx="14.25"
+          cy="19.774"
+          r="3.003"
+        ></circle>
+        <circle
+          class="stroke-base-200"
+          cx="14.25"
+          cy="19.774"
+          r="6.6067"
+        ></circle>
+        <circle
+          class="stroke-base-200"
+          cx="33.75"
+          cy="19.774"
+          r="6.6067"
+        ></circle>
+        <circle class="c" cx="30.3476" cy="19.774" r=".75"></circle>
+        <circle class="c" cx="37.1524" cy="19.774" r=".75"></circle>
+        <circle class="c" cx="33.75" cy="16.3716" r=".75"></circle>
+        <circle class="c" cx="33.75" cy="23.1764" r=".75"></circle>
+      </g>
     </svg>
   </a>
 
   <div class="dropdown dropdown-end block">
     <button tabindex="0" class="btn btn-sm btn-ghost">
-      <span class="hidden md:inline">Theme</span>
-      <svg
-        fill="none"
-        viewBox="0 0 24 24"
-        class="md:hidden size-6 stroke-current stroke-2"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          d="M4.098 19.902a3.75 3.75 0 0 0 5.304 0l6.401-6.402M6.75 21A3.75 3.75 0 0 1 3 17.25V4.125C3 3.504 3.504 3 4.125 3h5.25c.621 0 1.125.504 1.125 1.125v4.072M6.75 21a3.75 3.75 0 0 0 3.75-3.75V8.197M6.75 21h13.125c.621 0 1.125-.504 1.125-1.125v-5.25c0-.621-.504-1.125-1.125-1.125h-4.072M10.5 8.197l2.88-2.88c.438-.439 1.15-.439 1.59 0l3.712 3.713c.44.44.44 1.152 0 1.59l-2.879 2.88M6.75 17.25h.008v.008H6.75v-.008Z"
-        />
-      </svg>
-
+      <span class="inline">Theme: {{ currentTheme() }}</span>
       <svg
         fill="none"
         viewBox="0 0 24 24"
@@ -44,6 +70,6 @@
       </svg>
     </button>
     <!-- Themes -->
-    <app-dropdown-themes />
+    <app-dropdown-themes (themeChange)="onChangeTheme($event)" />
   </div>
 </div>

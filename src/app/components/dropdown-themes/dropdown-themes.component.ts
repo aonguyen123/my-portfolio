@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, output } from '@angular/core';
 import { distinctUntilChanged, map, startWith, Subject, tap } from 'rxjs';
 import { SearchFieldComponent } from '../search-field/search-field.component';
 
@@ -52,11 +52,13 @@ export class DropdownThemesComponent {
 
   themeSelected$ = new Subject<string>();
 
+  themeChange = output<string>();
+
   currentTheme$ = this.themeSelected$.pipe(
     startWith(localStorage.getItem('theme') || 'light'),
     tap((theme) => {
       localStorage.setItem('theme', theme);
-
+      this.themeChange.emit(theme);
       document
         .getElementsByTagName('html')[0]
         .setAttribute('data-theme', theme);
