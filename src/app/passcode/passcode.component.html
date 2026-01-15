@@ -1,0 +1,85 @@
+<ng-container>
+  <div
+    class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border-spacing-0.5"
+    #passcode
+  >
+    <div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c1
+      >
+        1
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c2
+      >
+        2
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c3
+      >
+        3
+      </div>
+    </div>
+    <div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c4
+      >
+        4
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c5
+      >
+        5
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c6
+      >
+        6
+      </div>
+    </div>
+    <div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c7
+      >
+        7
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c8
+      >
+        8
+      </div>
+      <div
+        class="w-[50px] h-[50px] bg-gray-400 rounded-full table-cell text-center align-middle text-white"
+        #c9
+      >
+        9
+      </div>
+    </div>
+
+    <div></div>
+  </div>
+
+  <div class="card bg-base-300 rounded-box grid place-items-center">
+    <ul class="p-2">
+      <li>
+        Use mouse to 'swipe' across the lock pad (hold mouse button and swipe.)
+      </li>
+      <li>
+        Pad will turn green if password is correct or red if password is
+        incorrect.
+      </li>
+    </ul>
+  </div>
+  <div class="divider"></div>
+  <div class="place-items-center truncate">
+    <h1 class="font-bold tracking-widest text-2xl" #result></h1>
+  </div>
+</ng-container>
