@@ -1,32 +1,40 @@
+import { CommonModule } from '@angular/common';
 import {
-  AfterViewInit,
   Component,
+  DestroyRef,
   effect,
   ElementRef,
+  inject,
   Renderer2,
+  signal,
   viewChild,
 } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { Router } from '@angular/router';
 import {
   defer,
   distinctUntilChanged,
+  EMPTY,
   filter,
   from,
   fromEvent,
+  iif,
   map,
   merge,
   Observable,
   pipe,
-  pluck,
   repeat,
   scan,
   sequenceEqual,
+  share,
   Subject,
   switchMap,
+  take,
   takeUntil,
   tap,
   throttleTime,
+  timer,
   toArray,
-  UnaryFunction,
 } from 'rxjs';
 
 type PadNumberObj = {
@@ -39,15 +47,22 @@ type PadNumberObj = {
 
 @Component({
   selector: 'app-passcode',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './passcode.component.html',
   styleUrl: './passcode.component.css',
 })
 export class PasscodeComponent {
   private readonly sub = new Subject<Array<number>>();
+  private readonly router = inject(Router);
+  private readonly destroyRef = inject(DestroyRef);
+
   private expectedPassword = [1, 2, 5, 2];
   private passcodeRef = viewChild<ElementRef<HTMLDivElement>>('passcode');
   private resultRef = viewChild<ElementRef<HTMLHeadingElement>>('result');
+  private messageRef = viewChild<ElementRef<HTMLHeadingElement>>('message');
+  private count = 4;
+  protected timeout = signal<number | null>(null);
+  protected checkMatchPassword$!: Observable<boolean>;
 
   // pad number ref
   private c1 = viewChild<ElementRef<HTMLDivElement>>('c1');
@@ -78,11 +93,16 @@ export class PasscodeComponent {
     fromEvent(this.passcodeRef()?.nativeElement!, 'touchstart')
   );
   private touchMove$ = defer(() =>
-    fromEvent<TouchEvent>(this.passcodeRef()?.nativeElement!, 'touchmove').pipe(
-      map((ev: TouchEvent) => ({
-        x: ev.touches[0].clientX,
-        y: ev.touches[0].clientY,
-      }))
+    fromEvent<TouchEvent>(this.passcodeRef()?.nativeElement!, 'touchmove', {
+      passive: false,
+    }).pipe(
+      map((ev: TouchEvent) => {
+        ev.preventDefault();
+        return {
+          x: ev.touches[0].clientX,
+          y: ev.touches[0].clientY,
+        };
+      })
     )
   );
   private touchEnd$ = defer(() =>
@@ -158,20 +178,33 @@ export class PasscodeComponent {
     });
   }
 
+  setResultText(
+    elementRef: HTMLSpanElement | HTMLHeadingElement,
+    text: string
+  ) {
+    return elementRef.setHTMLUnsafe(text);
+  }
+
   resetPasswordPad = () => {
     // reset result text
-    this.resultRef()?.nativeElement.setHTMLUnsafe('');
+    this.setResultText(this.resultRef()?.nativeElement!, '');
+    this.setResultText(this.messageRef()?.nativeElement!, '');
     // reset background
     this.setColorPasswordPad('#99a1af');
   };
 
   displaySelectedNumbersSoFar = (v: number) => {
     let cur = this.resultRef()?.nativeElement.textContent!;
-    this.resultRef()?.nativeElement.setHTMLUnsafe(cur + JSON.stringify(v));
+    this.setResultText(
+      this.resultRef()?.nativeElement!,
+      cur + JSON.stringify(v)
+    );
   };
 
   setResult = (result: boolean) => {
-    this.setColorPasswordPad(result ? 'MediumSeaGreen' : 'IndianRed');
+    const message = result ? 'Passcode matched. ' : 'Passcode does not match';
+    this.setColorPasswordPad(result ? 'MediumSeaGreen' : 'red');
+    this.setResultText(this.messageRef()?.nativeElement!, message);
   };
 
   takeMouseSwipe = pipe(
@@ -186,36 +219,66 @@ export class PasscodeComponent {
     distinctUntilChanged()
   );
 
+  setSessionWithExpiry(key: string, value: any, ttlMs: number) {
+    const expiredAt = Date.now() + ttlMs;
+    const data = {
+      value,
+      expiredAt,
+    };
+    sessionStorage.setItem(key, JSON.stringify(data));
+  }
+
   constructor(private renderer: Renderer2) {
     effect(() => {
       const pads = Array.from({ length: 9 }, (_, n) => n + 1).map((v) =>
         this.createPadObject(v, this.getPad(v)!.getBoundingClientRect())
       );
 
-      const actualPassword$ = this.start$
+      this.checkMatchPassword$ = this.start$.pipe(
+        tap(this.resetPasswordPad),
+        this.takeMouseSwipe,
+        map((v) => {
+          return pads.find(
+            (r) =>
+              v.x > r.left && v.x < r.right && v.y > r.top && v.y < r.bottom
+          )!;
+        }),
+        this.getIdOfSelectedPad,
+        tap(this.markTouchedPad),
+        tap(this.displaySelectedNumbersSoFar),
+        toArray(),
+        switchMap((passcode) => {
+          return from(passcode).pipe(
+            sequenceEqual(from(this.expectedPassword))
+          );
+        }),
+        tap(this.setResult),
+        repeat(),
+        share()
+      ) as Observable<boolean>;
+
+      const timeoutRedirect$ = timer(0, 1000).pipe(
+        take(this.count),
+        scan((acc, cur) => acc - 1, this.count)
+      );
+
+      this.checkMatchPassword$
         .pipe(
-          tap(this.resetPasswordPad),
-          this.takeMouseSwipe,
-          map((v) => {
-            return pads.find(
-              (r) =>
-                v.x > r.left && v.x < r.right && v.y > r.top && v.y < r.bottom
-            )!;
-          }),
-          this.getIdOfSelectedPad,
-          tap(this.markTouchedPad),
-          tap(this.displaySelectedNumbersSoFar),
-          toArray(),
-          switchMap((passcode) => {
-            return from(passcode).pipe(
-              sequenceEqual(from(this.expectedPassword))
+          switchMap((matched) => iif(() => matched, timeoutRedirect$, EMPTY)),
+          tap((timeout: number) => {
+            this.timeout.set(timeout);
+            this.setSessionWithExpiry(
+              'passcode',
+              JSON.stringify(this.expectedPassword),
+              5 * 60 * 1000
             );
           }),
-          tap(this.setResult),
-          tap((_) => {
-            console.log(_);
+          tap((timeout: number) => {
+            if (timeout === 0) {
+              this.router.navigate(['/']);
+            }
           }),
-          repeat()
+          takeUntilDestroyed(this.destroyRef)
         )
         .subscribe();
     });

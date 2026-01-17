@@ -1,13 +1,15 @@
 import { Routes } from '@angular/router';
+import { passcodeGuard } from './passcode-guard.guard';
 
 export const routes: Routes = [
+  // {
+  //   path: '',
+  //   redirectTo: 'passcode',
+  //   pathMatch: 'full',
+  // },
   {
     path: '',
-    redirectTo: 'passcode',
-    pathMatch: 'full',
-  },
-  {
-    path: '',
+    canActivate: [passcodeGuard],
     loadComponent: () =>
       import('./portfolio/portfolio.component').then(
         (c) => c.PortfolioComponent

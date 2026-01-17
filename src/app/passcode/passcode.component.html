@@ -81,5 +81,11 @@
   <div class="divider"></div>
   <div class="place-items-center truncate">
     <h1 class="font-bold tracking-widest text-2xl" #result></h1>
+    <div class="flex">
+      <span class="flex" #message></span>
+      &nbsp; @if (checkMatchPassword$ | async) {
+      <span class="flex">Redirecting in {{ timeout() }}s…</span>
+      }
+    </div>
   </div>
 </ng-container>
