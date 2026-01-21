@@ -63,6 +63,8 @@ export class PasscodeComponent {
   private count = 4;
   protected timeoutTime = signal<number | null>(null);
   protected checkMatchPassword$!: Observable<boolean>;
+  protected makeTimeout$!: Observable<number>;
+  protected countIncorrect$!: Observable<number>;
 
   // pad number ref
   private c1 = viewChild<ElementRef<HTMLDivElement>>('c1');
@@ -219,6 +221,11 @@ export class PasscodeComponent {
     distinctUntilChanged(),
   );
 
+  private timeoutRedirect$ = timer(0, 1000).pipe(
+    take(this.count),
+    scan((acc, cur) => acc - 1, this.count),
+  );
+
   setSessionWithExpiry(key: string, value: any, ttlMs: number) {
     const expiredAt = Date.now() + ttlMs;
     const data = {
@@ -257,30 +264,33 @@ export class PasscodeComponent {
         share(),
       ) as Observable<boolean>;
 
-      const timeoutRedirect$ = timer(0, 1000).pipe(
-        take(this.count),
-        scan((acc, cur) => acc - 1, this.count),
+      this.makeTimeout$ = this.checkMatchPassword$.pipe(
+        switchMap((matched: boolean) =>
+          iif(() => matched, this.timeoutRedirect$, EMPTY),
+        ),
+        tap((timeout: number) => {
+          if (timeout === 0) {
+            this.setSessionWithExpiry(
+              'passcode',
+              JSON.stringify(this.expectedPassword),
+              5 * 60 * 1000,
+            );
+            this.router.navigate(['/']);
+          }
+        }),
       );
 
-      this.checkMatchPassword$
-        .pipe(
-          switchMap((matched) => iif(() => matched, timeoutRedirect$, EMPTY)),
-          tap((timeout: number) => {
-            this.timeoutTime.set(timeout);
-          }),
-          tap((timeout: number) => {
-            if (timeout === 0) {
-              this.setSessionWithExpiry(
-                'passcode',
-                JSON.stringify(this.expectedPassword),
-                5 * 60 * 1000,
-              );
-              this.router.navigate(['/']);
-            }
-          }),
-          takeUntilDestroyed(this.destroyRef),
-        )
-        .subscribe();
+      this.countIncorrect$ = this.checkMatchPassword$.pipe(
+        scan((acc: number, cur: boolean) => {
+          if (!cur) {
+            return acc + 1;
+          }
+          return acc;
+        }, 0),
+        tap((_) => {
+          console.log(_);
+        }),
+      );
     });
   }
 }

@@ -84,9 +84,26 @@
     <div class="flex">
       <span class="flex" #message></span>
       &nbsp;
-      @if (checkMatchPassword$ | async) {
-        <span class="flex">Redirecting in {{ timeoutTime() }}s…</span>
-      }
+      <ng-container
+        *ngIf="{
+          check: checkMatchPassword$ | async,
+          timeout: makeTimeout$ | async,
+        } as vm"
+      >
+        @if (vm.check) {
+          <span class="flex">Redirecting in {{ vm.timeout }}s…</span>
+        }
+      </ng-container>
     </div>
+
+    <ng-container *ngIf="countIncorrect$ | async as countIncorrect">
+      @if (countIncorrect >= 5) {
+        <div>
+          <span class="font-bold"
+            >You enter {{ countIncorrect }} passcode incorrect</span
+          >
+        </div>
+      }
+    </ng-container>
   </div>
 </ng-container>
