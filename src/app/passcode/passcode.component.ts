@@ -56,12 +56,12 @@ export class PasscodeComponent {
   private readonly router = inject(Router);
   private readonly destroyRef = inject(DestroyRef);
 
-  private expectedPassword = [1, 2, 5, 2];
+  private expectedPassword = [1, 2, 3, 2, 5, 8];
   private passcodeRef = viewChild<ElementRef<HTMLDivElement>>('passcode');
   private resultRef = viewChild<ElementRef<HTMLHeadingElement>>('result');
   private messageRef = viewChild<ElementRef<HTMLHeadingElement>>('message');
   private count = 4;
-  protected timeout = signal<number | null>(null);
+  protected timeoutTime = signal<number | null>(null);
   protected checkMatchPassword$!: Observable<boolean>;
 
   // pad number ref
@@ -77,20 +77,20 @@ export class PasscodeComponent {
 
   // mouse event
   private mouseDown$ = defer(() =>
-    fromEvent(this.passcodeRef()?.nativeElement!, 'mousedown')
+    fromEvent(this.passcodeRef()?.nativeElement!, 'mousedown'),
   );
   private mouseUp$ = defer(() =>
-    fromEvent(this.passcodeRef()?.nativeElement!, 'mouseup')
+    fromEvent(this.passcodeRef()?.nativeElement!, 'mouseup'),
   );
   private mouseMove$ = defer(() =>
     fromEvent<MouseEvent>(this.passcodeRef()?.nativeElement!, 'mousemove').pipe(
-      map(({ clientX, clientY }: MouseEvent) => ({ x: clientX, y: clientY }))
-    )
+      map(({ clientX, clientY }: MouseEvent) => ({ x: clientX, y: clientY })),
+    ),
   );
 
   // touch event
   private touchStart$ = defer(() =>
-    fromEvent(this.passcodeRef()?.nativeElement!, 'touchstart')
+    fromEvent(this.passcodeRef()?.nativeElement!, 'touchstart'),
   );
   private touchMove$ = defer(() =>
     fromEvent<TouchEvent>(this.passcodeRef()?.nativeElement!, 'touchmove', {
@@ -102,11 +102,11 @@ export class PasscodeComponent {
           x: ev.touches[0].clientX,
           y: ev.touches[0].clientY,
         };
-      })
-    )
+      }),
+    ),
   );
   private touchEnd$ = defer(() =>
-    fromEvent(this.passcodeRef()?.nativeElement!, 'touchend')
+    fromEvent(this.passcodeRef()?.nativeElement!, 'touchend'),
   );
 
   private start$ = merge(this.mouseDown$, this.touchStart$);
@@ -116,7 +116,7 @@ export class PasscodeComponent {
   expectedPassword$ = this.sub.pipe(
     tap((v: Array<number>) => {
       this.expectedPassword = v;
-    })
+    }),
   );
 
   createPadObject(id: number, rectange: DOMRect) {
@@ -180,7 +180,7 @@ export class PasscodeComponent {
 
   setResultText(
     elementRef: HTMLSpanElement | HTMLHeadingElement,
-    text: string
+    text: string,
   ) {
     return elementRef.setHTMLUnsafe(text);
   }
@@ -197,7 +197,7 @@ export class PasscodeComponent {
     let cur = this.resultRef()?.nativeElement.textContent!;
     this.setResultText(
       this.resultRef()?.nativeElement!,
-      cur + JSON.stringify(v)
+      cur + JSON.stringify(v),
     );
   };
 
@@ -210,13 +210,13 @@ export class PasscodeComponent {
   takeMouseSwipe = pipe(
     switchMap(() => this.move$),
     throttleTime(50),
-    takeUntil(this.end$)
+    takeUntil(this.end$),
   );
 
   getIdOfSelectedPad = pipe(
     filter((v: PadNumberObj) => !!v),
     map((v) => v.id),
-    distinctUntilChanged()
+    distinctUntilChanged(),
   );
 
   setSessionWithExpiry(key: string, value: any, ttlMs: number) {
@@ -231,7 +231,7 @@ export class PasscodeComponent {
   constructor(private renderer: Renderer2) {
     effect(() => {
       const pads = Array.from({ length: 9 }, (_, n) => n + 1).map((v) =>
-        this.createPadObject(v, this.getPad(v)!.getBoundingClientRect())
+        this.createPadObject(v, this.getPad(v)!.getBoundingClientRect()),
       );
 
       this.checkMatchPassword$ = this.start$.pipe(
@@ -240,7 +240,7 @@ export class PasscodeComponent {
         map((v) => {
           return pads.find(
             (r) =>
-              v.x > r.left && v.x < r.right && v.y > r.top && v.y < r.bottom
+              v.x > r.left && v.x < r.right && v.y > r.top && v.y < r.bottom,
           )!;
         }),
         this.getIdOfSelectedPad,
@@ -249,36 +249,36 @@ export class PasscodeComponent {
         toArray(),
         switchMap((passcode) => {
           return from(passcode).pipe(
-            sequenceEqual(from(this.expectedPassword))
+            sequenceEqual(from(this.expectedPassword)),
           );
         }),
         tap(this.setResult),
         repeat(),
-        share()
+        share(),
       ) as Observable<boolean>;
 
       const timeoutRedirect$ = timer(0, 1000).pipe(
         take(this.count),
-        scan((acc, cur) => acc - 1, this.count)
+        scan((acc, cur) => acc - 1, this.count),
       );
 
       this.checkMatchPassword$
         .pipe(
           switchMap((matched) => iif(() => matched, timeoutRedirect$, EMPTY)),
           tap((timeout: number) => {
-            this.timeout.set(timeout);
-            this.setSessionWithExpiry(
-              'passcode',
-              JSON.stringify(this.expectedPassword),
-              5 * 60 * 1000
-            );
+            this.timeoutTime.set(timeout);
           }),
           tap((timeout: number) => {
             if (timeout === 0) {
+              this.setSessionWithExpiry(
+                'passcode',
+                JSON.stringify(this.expectedPassword),
+                5 * 60 * 1000,
+              );
               this.router.navigate(['/']);
             }
           }),
-          takeUntilDestroyed(this.destroyRef)
+          takeUntilDestroyed(this.destroyRef),
         )
         .subscribe();
     });
